@@ -1,0 +1,64 @@
+import java.text.DecimalFormat
+
+plugins {
+	id 'org.springframework.boot' version '2.3.4.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'java'
+}
+
+group = 'com.polarbear08'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
+
+help {
+	doFirst {
+		println "hello"
+	}
+	doLast {
+		println "goodbye"
+	}
+}
+
+task foo {
+	doFirst { 
+		println "this: ${this}"
+		println "delegate: ${delegate}"
+		println "delegate.class: ${delegate.class}"
+	}
+}
+
+def showMemoryStatus = {
+	DecimalFormat memoryFormat = new DecimalFormat("###,###MB")
+	DecimalFormat ratioFormat  = new DecimalFormat("##.#")
+	Runtime runtime = Runtime.getRuntime()
+	long free = runtime.freeMemory() / (1024 * 1024)
+	long total = runtime.totalMemory() / (1024 * 1024)
+	long max = runtime.maxMemory() / (1024 * 1024)
+	long used = total - free
+	double ratio = (used * 100 / (double) total)
+
+	println "Total: ${memoryFormat.format(total)}"
+	println "Free: ${memoryFormat.format(free)}"
+	println "Used: ${memoryFormat.format(used)} (${ratioFormat.format(ratio)})%"
+	println "Max: ${memoryFormat.format(max)}"
+}
+
+build {
+	// finalizedBy "showMemoryStatus"
+	doFirst showMemoryStatus
+}
